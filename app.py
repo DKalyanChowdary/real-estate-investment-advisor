@@ -5,6 +5,7 @@ import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
 import gdown
+import os
 
 # ---------------------------------
 # Google Drive Dataset Loader
@@ -15,7 +16,6 @@ def load_data():
     download_url = f"https://drive.google.com/uc?id={file_id}&export=download"
     df = pd.read_csv(download_url)
 
-
     df["price_per_sqft"] = (df["Price_in_Lakhs"] * 100000) / df["Size_in_SqFt"]
     df["Future_Price_5yrs"] = df["Price_in_Lakhs"] * (1 + 0.08) ** 5
     df["Infrastructure_Score"] = df["Nearby_Schools"].fillna(0) + df["Nearby_Hospitals"].fillna(0)
@@ -25,21 +25,38 @@ def load_data():
     return df
 
 # ---------------------------------
-# Load trained models
+# Load trained models (AUTO DOWNLOAD FROM GOOGLE DRIVE)
 # ---------------------------------
-# Google Drive file IDs
+
 REG_ID = "16X-6KXO6xneZGrb76Z1vwaOXemtN9E41"   # regression model
 CLS_ID = "1csnGqCpOlA0DQwaUJHAjdLG_IKKvLxW4"   # classification model
 
-# Direct download URLs
 REG_URL = f"https://drive.google.com/uc?id={REG_ID}&export=download"
 CLS_URL = f"https://drive.google.com/uc?id={CLS_ID}&export=download"
 
-reg_model = joblib.load("models/regression_model.pkl")
-cls_model = joblib.load("models/classification_model.pkl")
+REG_PATH = "regression_model.pkl"
+CLS_PATH = "classification_model.pkl"
 
+@st.cache_resource
+def load_models():
+    # Download regression model
+    if not os.path.exists(REG_PATH):
+        gdown.download(REG_URL, REG_PATH, quiet=False)
+
+    # Download classification model
+    if not os.path.exists(CLS_PATH):
+        gdown.download(CLS_URL, CLS_PATH, quiet=False)
+
+    reg = joblib.load(REG_PATH)
+    cls = joblib.load(CLS_PATH)
+    return reg, cls
+
+reg_model, cls_model = load_models()
 df = load_data()
 
+# ---------------------------------
+# Streamlit UI
+# ---------------------------------
 st.set_page_config(page_title="Real Estate Investment Advisor", layout="wide")
 st.title("🏠 Real Estate Investment Advisor")
 st.write("Predict future property value and check if it's a good investment.")
@@ -50,13 +67,13 @@ st.write("Predict future property value and check if it's a good investment.")
 st.sidebar.header("Filter Properties")
 
 min_size, max_size = int(df["Size_in_SqFt"].min()), int(df["Size_in_SqFt"].max())
-size_filter = st.sidebar.slider("Size (SqFt)", min_size, max_size, (min_size, min_size+300))
+size_filter = st.sidebar.slider("Size (SqFt)", min_size, max_size, (min_size, min_size + 300))
 
 min_price, max_price = int(df["Price_in_Lakhs"].min()), int(df["Price_in_Lakhs"].max())
-price_filter = st.sidebar.slider("Price (Lakhs)", min_price, max_price, (min_price, min_price+30))
+price_filter = st.sidebar.slider("Price (Lakhs)", min_price, max_price, (min_price, min_price + 30))
 
 bhk_filter = st.sidebar.multiselect(
-    "BHK Options", sorted(df["BHK"].dropna().unique()), default=[2,3]
+    "BHK Options", sorted(df["BHK"].dropna().unique()), default=[2, 3]
 )
 
 city_list = ["All"] + sorted(df["City"].dropna().unique())
@@ -79,19 +96,19 @@ st.dataframe(filtered_df.head(50))
 # -----------------------------------
 # Visual Insights
 # -----------------------------------
-st.subheader("📊 city Visual Insights")
+st.subheader("📊 City Visual Insights")
 
-# bar (City Price per SqFt)
+# City Price per SqFt
 if "City" in df.columns:
     city_pps = df.groupby("City")["price_per_sqft"].median().sort_values(ascending=False)
-    fig, ax = plt.subplots(figsize=(10,4))
+    fig, ax = plt.subplots(figsize=(10, 4))
     sns.barplot(x=city_pps.index[:20], y=city_pps.values[:20], ax=ax)
     plt.xticks(rotation=45)
     st.pyplot(fig)
 
 # Trend chart (Median Price per BHK)
 bhk_trend = df.groupby("BHK")["Price_in_Lakhs"].median()
-fig2, ax2 = plt.subplots(figsize=(7,4))
+fig2, ax2 = plt.subplots(figsize=(7, 4))
 sns.lineplot(x=bhk_trend.index, y=bhk_trend.values, marker="o", ax=ax2)
 ax2.set_title("Median Price by BHK")
 st.pyplot(fig2)
@@ -140,11 +157,9 @@ input_df = pd.DataFrame([{
 }])
 
 if st.button("Predict"):
-    # Regression
     future_price = reg_model.predict(input_df)[0]
     st.success(f"Estimated Price After 5 Years: ₹ {future_price:,.2f} Lakhs")
 
-    # Classification + Probability
     class_pred = cls_model.predict(input_df)[0]
     prob = cls_model.predict_proba(input_df)[0][1]
 
@@ -169,11 +184,10 @@ try:
         "importance": importances
     }).sort_values("importance", ascending=False).head(20)
 
-    fig3, ax3 = plt.subplots(figsize=(8,6))
+    fig3, ax3 = plt.subplots(figsize=(8, 6))
     sns.barplot(data=fi, x="importance", y="feature", ax=ax3)
     ax3.set_title("Top Feature Importances")
     st.pyplot(fig3)
 
 except Exception as e:
-
     st.write("Feature importance could not be displayed:", e)
