@@ -28,8 +28,8 @@ def load_data():
 # Load trained models (AUTO DOWNLOAD FROM GOOGLE DRIVE)
 # ---------------------------------
 
-REG_ID = "16X-6KXO6xneZGrb76Z1vwaOXemtN9E41"   # regression model
-CLS_ID = "1csnGqCpOlA0DQwaUJHAjdLG_IKKvLxW4"   # classification model
+REG_ID = "1RKofV4OLuJP8xtGOu3yxkUq_i9tptgii"   # regression model
+CLS_ID = "1EgcHqE9nTlyCXFAcY3coYLqGGd74rtnY"   # classification
 
 REG_URL = f"https://drive.google.com/uc?id={REG_ID}&export=download"
 CLS_URL = f"https://drive.google.com/uc?id={CLS_ID}&export=download"
@@ -191,3 +191,4 @@ try:
 
 except Exception as e:
     st.write("Feature importance could not be displayed:", e)
+
