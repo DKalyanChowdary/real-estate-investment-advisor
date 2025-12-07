@@ -4,13 +4,14 @@ import numpy as np
 import joblib
 import matplotlib.pyplot as plt
 import seaborn as sns
+import gdown
 
 # ---------------------------------
 # Google Drive Dataset Loader
 # ---------------------------------
 @st.cache_data
 def load_data():
-    file_id = "1b4GCB0hqIqGy8l1mrUit0Lr7yuAM9RkR"
+    file_id = "1mbGUFYsNGrqCT0UEyAM6kowpQ0Ixleu-"
     download_url = f"https://drive.google.com/uc?id={file_id}&export=download"
     df = pd.read_csv(download_url)
 
@@ -26,6 +27,14 @@ def load_data():
 # ---------------------------------
 # Load trained models
 # ---------------------------------
+# Google Drive file IDs
+REG_ID = "16X-6KXO6xneZGrb76Z1vwaOXemtN9E41"   # regression model
+CLS_ID = "1csnGqCpOlA0DQwaUJHAjdLG_IKKvLxW4"   # classification model
+
+# Direct download URLs
+REG_URL = f"https://drive.google.com/uc?id={REG_ID}&export=download"
+CLS_URL = f"https://drive.google.com/uc?id={CLS_ID}&export=download"
+
 reg_model = joblib.load("models/regression_model.pkl")
 cls_model = joblib.load("models/classification_model.pkl")
 
@@ -166,4 +175,5 @@ try:
     st.pyplot(fig3)
 
 except Exception as e:
+
     st.write("Feature importance could not be displayed:", e)
