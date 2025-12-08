@@ -1,0 +1,32 @@
+🏠 Real Estate Investment Advisor
+Introduction
+This project focuses on building a machine learning system that predicts whether a property is a good investment and forecasts its price over the next 5 years. It includes data analysis, feature engineering, model building in integrates machine learning models like random forest with an interactive dashboard for real time insights. ML flow experiment tracking, and deployment through a Stream lit application.
+Domain Introduction
+Real estate analytics helps organizations understand property trends, price behaviour and investment opportunities using data driven insights. It supports informed decision making by identifying factors that influence property value. This domain combines structured property data with market intelligence and statistical modelling for this we analyse various features like location, size, age, amenities and infrastructure to predict investment quality and future price trends.
+Objective & ELT Approach
+It is to build classification and regression models for investment scoring and price forecasting. The project aims to empower buyers and investors with accurate data-driven predictions. Loding Dataset using url into the processing environment and transformed through cleaning, feature creation and enrichment. This ensured the dataset was consistent, structured and modelling ready.
+Exploratory Data Analysis (Insights)
+Price per square foot varied significantly across cities indicating location driven pricing. properties and BHKs were associated with higher investment scores.  Amenities count and infrastructure proximity strongly influenced user interest and value.  The distribution of property prices was right skewed suggesting a few luxury properties pulled the mean upward.  and analysis showed size, BHK and location as major drivers of price behaviour.
+Feature Engineering
+Generated price per square foot to normalize values and Created amenities count and infrastructure score to represent lifestyle quality and designed the investment label using city medians, age and property features.  Encoded categorical fields using one hot encoding and scaled numerical fields to perform algorithms.
+    
+
+Model Building
+Random Forest was chosen for both classification and regression due to its robustness, ability to handle non-linear data and resistance to overfitting and we saved model also. 
+ 
+ ML flow Tracking and pipelines
+All model runs were logged using ML flow including parameters, metrics, artifacts and trained models. This enabled version and showing flow of pipe lines
+ Deployment (Streamlit App)
+A Stream lit dashboard was built where users input property details and receive:
+Investment prediction and Price forecast  and Visual analytics like price distribution and feature impact filtered table with slide bar we can choose state wise, price range, bhk and many more
+  
+ 
+
+Insights Summary
+•	Location strongly influences both price and investment score.
+•	Higher amenities and infrastructure add noticeable value.
+•	Newer and spacious properties consistently score higher.
+•	Outliers affect price scale so normalization was required.
+•	Engineered features significantly improved model performance.
+To access deployed file
+URL: https://real-estate-investment-advisor-wwhtvm2oai3n2x5xflyypx.streamlit.app/
